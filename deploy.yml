@@ -1,0 +1,18 @@
+- name: Deploy backend
+  hosts: "{% if hosts is defined %}{{ hosts }}{% else %}all{% endif %}"
+  become: true
+
+  vars:
+    service_name: "{{ deploy }}"
+    vault_token: "{{ lookup('env','VAULT_TOKEN') }}"
+    backend:
+      image: "{{ backend_image }}"
+      container_name: "{{ service_name }}"
+      logs_path: "/var/docker/{{ service_name }}/logs"
+    postgres:
+      image: "postgres:15-alpine"
+      container_name: "{{ service_name }}_db"
+      data_path: "/var/docker/{{ service_name }}/postgres"
+
+  roles:
+    - role: role
