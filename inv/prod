@@ -1,0 +1,7 @@
+[all:vars]
+deploy=prod
+vault_addr=https://vault.example.com
+ansible_python_interpreter=/usr/bin/python3
+
+[app]
+example-host ansible_user=ansible ansible_port=22 deploy=app backend_web_port=8000 containers_address=0.0.0.0
