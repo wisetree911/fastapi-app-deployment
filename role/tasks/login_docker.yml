@@ -1,0 +1,10 @@
+---
+- name : Get docker registry settings
+  vault:
+    path: secret/docker_registry
+    vault_addr: "{{ vault_addr }}"
+    vault_token: "{{ vault_token }}"
+  register: docker_registry
+
+- name: Login docker gitlab
+  shell: docker login -u {{ docker_registry.username }} -p {{ docker_registry.password }} {{ docker_registry.address }}
