@@ -1,0 +1,27 @@
+---
+- name: Pull backend image
+  shell: docker pull {{ backend.image }}
+
+- name: Stop backend container
+  docker_container:
+    name: "{{ backend.container_name }}"
+    image: "{{ backend.image }}"
+    state: absent
+
+- name: Start container
+  docker_container:
+    name: "{{ backend.container_name }}"
+    image: "{{ backend.image }}"
+    command: >-
+      sh -c "uv run alembic upgrade head && uv run uvicorn {{ settings.env.UVICORN_APP | default('src.main:app') }} --host 0.0.0.0 --port 8000"
+    restart_policy: always
+    state: started
+    hostname: "{{ backend.container_name }}_{{ ansible_hostname }}"
+    etc_hosts: "{% if settings.etc_hosts is defined %}{{ settings.etc_hosts }}{% else %}{}{% endif %}"
+    links:
+      - "{{ postgres.container_name }}:db"
+    ports:
+      - "{% if containers_address is defined %}{{ containers_address }}{% else %}127.0.0.1{% endif %}:{{ backend_web_port }}:8000"
+    volumes:
+      - "{{ backend.logs_path }}:/logs"
+    env: "{{ settings.env }}"
