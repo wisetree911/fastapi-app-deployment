@@ -1,0 +1,19 @@
+---
+- name: Pull frontend image
+  shell: docker pull {{ frontend.image }}
+
+- name: Stop frontend container
+  docker_container:
+    name: "{{ frontend.container_name }}"
+    image: "{{ frontend.image }}"
+    state: absent
+
+- name: Start frontend container
+  docker_container:
+    name: "{{ frontend.container_name }}"
+    image: "{{ frontend.image }}"
+    restart_policy: always
+    state: started
+    hostname: "{{ frontend.container_name }}_{{ ansible_hostname }}"
+    ports:
+      - "{% if containers_address is defined %}{{ containers_address }}{% else %}127.0.0.1{% endif %}:{{ frontend_web_port }}:80"
