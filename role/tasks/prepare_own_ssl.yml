@@ -1,0 +1,24 @@
+---
+- name: Get http ssl
+  vault:
+    path: "{{ ssl_vault_path | default('secret/ssl/' ~ inventory_hostname) }}"
+    vault_addr: "{{ vault_addr }}"
+    vault_token: "{{ vault_token }}"
+  register: web_ssl
+  no_log: true
+
+- name: Create ssl-crt
+  shell: echo "{{ web_ssl.crt }}" > /etc/nginx/ssl/{{ inventory_hostname }}.crt
+
+- name: Create ssl-key
+  shell: echo "{{ web_ssl.key }}" > /etc/nginx/ssl/{{ inventory_hostname }}.key
+  no_log: true
+
+- name: Set ssl owner
+  file:
+    path: "{{ item }}"
+    owner: "{{ web_user }}"
+    group: "{{ web_user }}"
+  with_items:
+    - "/etc/nginx/ssl/{{ inventory_hostname }}.key"
+    - "/etc/nginx/ssl/{{ inventory_hostname }}.crt"
