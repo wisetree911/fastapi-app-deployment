@@ -1,0 +1,16 @@
+---
+- name: Ensure nginx config directory exists
+  file:
+    path: "{{ nginx_conf_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Create nginx config
+  template:
+    src: nginx.jinja2
+    dest: "{{ nginx_conf_dir }}/{{ service_name }}.conf"
+
+- name: Reload nginx
+  service:
+    name: nginx
+    state: reloaded
