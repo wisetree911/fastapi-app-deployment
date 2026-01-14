@@ -1,11 +1,7 @@
 #!/usr/bin/python3
 from ansible.module_utils.basic import *
 from ansible.module_utils import urls
-
-try:
-    from urllib.parse import urljoin
-except ImportError:
-     from urlparse import urljoin
+from urllib.parse import urljoin
 
 
 def main():
